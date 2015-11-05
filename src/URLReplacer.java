@@ -9,11 +9,15 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import java.io.IOException;
 import java.util.List;
 
-public class Helper {
+public class URLReplacer {
 
-    public static void getURL(String oldreportid, String newreportid, String oldpdf, String newpdf) {
+    public static void replaceUrl(String... a) {
+        String oldpdf = a[0];
+        String newpdf = a[1];
+        String http1a = a[2];
+        String http1b = a[33];
+
         PDDocument doc = null;
-
         try {
             doc = PDDocument.load(oldpdf);
             List allPages = doc.getDocumentCatalog().getAllPages();
@@ -30,18 +34,16 @@ public class Helper {
                             String oldURL = uri.getURI();
 
                             String reportID = oldURL.substring(oldURL.lastIndexOf("=") + 1, oldURL.length());
-                            if (oldreportid.equals(reportID)) {
-                                String newURI = "http://www.lombardstreetresearch.com/lsrlink.php?T=MQ==&F=" + newreportid;
+                            if (http1a.equals(reportID)) {
+                                String newURI = "http://www.lombardstreetresearch.com/lsrlink.php?T=MQ==&F=" + http1b;
                                 System.out.println("Page " + (i + 1) + ": Replacing " + oldURL + " with " + newURI);
-                                uri.setURI(newURI);
+                                uri.setURI(http1b);
                             }
                         }
                     }
                 }
             }
-
             doc.save(newpdf);
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (COSVisitorException e) {
