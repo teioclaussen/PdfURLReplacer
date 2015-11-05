@@ -17,9 +17,7 @@ public class URLReplacer {
         String http1a = a[2];
         String http1b = a[33];
 
-        PDDocument doc = null;
-        try {
-            doc = PDDocument.load(oldpdf);
+        try (PDDocument doc = PDDocument.load(oldpdf)) {
             List allPages = doc.getDocumentCatalog().getAllPages();
             for (int i = 0; i < allPages.size(); i++) {
                 PDPage page = (PDPage) allPages.get(i);
@@ -44,18 +42,8 @@ public class URLReplacer {
                 }
             }
             doc.save(newpdf);
-        } catch (IOException e) {
+        } catch (IOException | COSVisitorException e) {
             e.printStackTrace();
-        } catch (COSVisitorException e) {
-            e.printStackTrace();
-        } finally {
-            if (doc != null) {
-                try {
-                    doc.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
