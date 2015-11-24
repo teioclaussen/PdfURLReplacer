@@ -11,14 +11,9 @@ import java.util.List;
 
 public class URLReplacer {
 
-    public static void replaceUrl(String... a) {
-        String oldpdf = a[0];
-        String newpdf = a[1];
-        String http1a = a[2];
-        String http1b = a[33];
-
-        try (PDDocument doc = PDDocument.load(oldpdf)) {
-            List allPages = doc.getDocumentCatalog().getAllPages();
+    public static void changeURL(String... a) {
+        try (PDDocument doc = PDDocument.load(a[0])) {
+            List<?> allPages = doc.getDocumentCatalog().getAllPages();
             for (int i = 0; i < allPages.size(); i++) {
                 PDPage page = (PDPage) allPages.get(i);
                 List annotations = page.getAnnotations();
@@ -32,16 +27,16 @@ public class URLReplacer {
                             String oldURL = uri.getURI();
 
                             String reportID = oldURL.substring(oldURL.lastIndexOf("=") + 1, oldURL.length());
-                            if (http1a.equals(reportID)) {
-                                String newURI = "http://www.lombardstreetresearch.com/lsrlink.php?T=MQ==&F=" + http1b;
-                                System.out.println("Page " + (i + 1) + ": Replacing " + oldURL + " with " + newURI);
-                                uri.setURI(http1b);
+                            if (a[2].equals(oldURL)) {
+                                //String newURI = "http://www.lombardstreetresearch.com/lsrlink.php?T=MQ==&F=NzQ2" + url2;
+                                System.out.println("Page " + (i + 1) + ": Replacing " + oldURL + " with " + a[3]);
+                                uri.setURI(a[3]);
                             }
                         }
                     }
                 }
             }
-            doc.save(newpdf);
+            doc.save(a[1]);
         } catch (IOException | COSVisitorException e) {
             e.printStackTrace();
         }
