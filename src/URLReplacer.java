@@ -8,17 +8,17 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class URLReplacer {
 
-    public static void changeURL(String... a) {
-        try (PDDocument doc = PDDocument.load(a[0])) {
-            List<?> allPages = doc.getDocumentCatalog().getAllPages();
-            for (int i = 0; i < allPages.size(); i++) {
-                PDPage page = (PDPage) allPages.get(i);
-                List annotations = page.getAnnotations();
-                for (int j = 0; j < annotations.size(); j++) {
-                    PDAnnotation annot = (PDAnnotation) annotations.get(j);
+    public static void changeURL(String originalPdf, String targetPdf, Map<String, String> urls) {
+
+        try (PDDocument doc = PDDocument.load(originalPdf)) {
+            List<PDPage> allPages = doc.getDocumentCatalog().getAllPages();
+            for (PDPage page : allPages) {
+                // List annotations = page.getAnnotations();
+                for (PDAnnotation annot : page.getAnnotations()) {
                     if (annot instanceof PDAnnotationLink) {
                         PDAnnotationLink link = (PDAnnotationLink) annot;
                         PDAction action = link.getAction();
@@ -26,17 +26,16 @@ public class URLReplacer {
                             PDActionURI uri = (PDActionURI) action;
                             String oldURL = uri.getURI();
 
-                            String reportID = oldURL.substring(oldURL.lastIndexOf("=") + 1, oldURL.length());
-                            if (a[2].equals(oldURL)) {
-                                //String newURI = "http://www.lombardstreetresearch.com/lsrlink.php?T=MQ==&F=NzQ2" + url2;
-                                System.out.println("Page " + (i + 1) + ": Replacing " + oldURL + " with " + a[3]);
-                                uri.setURI(a[3]);
+                            for (Map.Entry<String, String> url : urls.entrySet()) {
+                                if (url.getKey().equals(oldURL)) {
+                                    uri.setURI(url.getValue());
+                                }
                             }
                         }
                     }
                 }
             }
-            doc.save(a[1]);
+            doc.save(targetPdf);
         } catch (IOException | COSVisitorException e) {
             e.printStackTrace();
         }
